@@ -10,7 +10,7 @@ contract CarbonCoinFaucet is ERC20 {
     address public admin;
     mapping (address => uint256) public nextMint;
     uint256 private maximumMintCap = 50;
-    uint256 private mintAmount = 5; 
+    uint256 private mintAmount = 0; 
     uint256 private mintDelay = 24 * 60 * 60;
 
     modifier onlyAdmin(){
@@ -20,9 +20,9 @@ contract CarbonCoinFaucet is ERC20 {
 
     function mint(address _to, uint256 _predictedGasCost) public onlyAdmin {
         require(mintAmount > 0, "Minting is not enabled");
-        require(_predictedGasCost < address(this).balance);
+        require(_predictedGasCost < address(this).balance, "Not enough balance for minting"); //how to handle no suficient gas?
         require(nextMint[_to] < block.timestamp, "Only one mint per address in a row");
-        require(msg.sender.balance > 1000000000000000, "Minimum balance amount of 0.001 ETH");
+        require(_to.balance >= 1 ether / 1000, "Minimum balance amount of 0.001 ETH needed");
         _mint(_to, mintAmount);
         nextMint[_to] = block.timestamp + mintDelay;
     }
